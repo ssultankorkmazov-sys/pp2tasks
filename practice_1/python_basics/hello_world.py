@@ -1,0 +1,5 @@
+print("Hello, World!")
+print("Hello, KBTU!")
+print("first task at python_basics folder")
+print("Thx so mush for your attention!")
+print("See ya!")
