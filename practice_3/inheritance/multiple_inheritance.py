@@ -15,6 +15,16 @@ class Student(Person):
   def __init__(self, fname, lname, year):
     super().__init__(fname, lname)
     self.graduationyear = year
+    self.welcome()
 
   def welcome(self):
     print("Welcome", self.firstname, self.lastname, "to the class of", self.graduationyear)
+
+class Postgraduate(Student):
+  def __init__(self, fname, lname, year, university):
+    super().__init__(fname, lname, year)
+    self.university = university
+    self.congratulate()
+
+  def congratulate(self):
+    print(f"Congratulations! You have finished your studies at {self.university}.")
