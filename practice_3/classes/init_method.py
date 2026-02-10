@@ -55,6 +55,12 @@ class Person:
     self.age = age
     self.city = city
     self.country = country
+    self.isOld()
+  
+  def isOld(self):
+    if self.age > 50:
+      print("Definitely, yes")
+  
 
 p1 = Person("Linus", 30, "Oslo", "Norway")
 
