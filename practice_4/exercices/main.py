@@ -1,19 +1,12 @@
 import json
 
-with open("sample-data.json") as f:
+with open("sample-data.json", "r") as f:
     data = json.load(f)
 
 print("Interface Status")
 print("=" * 80)
-print(f"{'DN':50} {'Description':20} {'Speed':8} {'MTU':6}")
-print("-" * 80)
-
-for item in data["imdata"]:
-    attributes = item["l1PhysIf"]["attributes"]
-
-    dn = attributes["dn"]
-    descr = attributes["descr"]
-    speed = attributes["speed"]
-    mtu = attributes["mtu"]
-
-    print(f"{dn:50} {descr:20} {speed:8} {mtu:6}")
+print(f"{'DN':44} {'Description':13} {'Speed':10} {'MTU':6}")
+print("-" * 42, " ", "-"*10, "  ", "-"*6, "  ", '-'*5)
+for i in range(3):
+    attributes = data['imdata'][i]['l1PhysIf']['attributes']
+    print(f"{attributes['dn']:44} {attributes['descr']:13} {attributes['speed']:10} {attributes['mtu']:6}")
