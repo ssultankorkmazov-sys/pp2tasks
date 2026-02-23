@@ -5,11 +5,21 @@ today = datetime.now()
 yesterday = today - timedelta(days=1)
 tomorrow = today + timedelta(days=1)
 
+print("="*5, "The first task", '='*5)
+
 print(today - timedelta(days=5))
+
+print("="*5, "The second task", '='*5)
+
 print(f"Yesterday was: {yesterday.date()}")
 print(f"Today is: {today.date()}")
 print(f"Tomorrow will be: {tomorrow.date()}")
+
+print("="*5, "The third task", '='*5)
+
 print(f"Current microseconds: {today.microsecond}")
+
+print("="*5, "The forth task", '='*5)
 
 # Input format example: 2026-02-18 14:30:00
 date1_str = input("Enter first date (YYYY-MM-DD HH:MM:SS): ")
