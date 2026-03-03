@@ -1,0 +1,9 @@
+a ab abb abbb abbbb axxxb
+snake_case example_string test_variable another_example
+Hello World Test Python Regex Example
+CamelCaseString AnotherTestCase SimpleXMLParser
+This is a sample text, with spaces, commas, and dots.
+convert_this_snake_case to camelCaseFormat
+SplitThisStringAtUppercaseLetters
+InsertSpacesBetweenCapitalWords
+ConvertCamelCaseToSnakeCase
