@@ -1,5 +1,5 @@
 import pygame
-from color_palette import *
+from Tsis.tsis_4.color_palette import *
 import random
 
 pygame.init()
