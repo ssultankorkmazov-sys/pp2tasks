@@ -58,6 +58,7 @@ while True:
             result = run_game(
                 surface, clock, bg_image, player_images,
                 enemy_image, crash_sound, settings, username,
+                assets_dir=ASSETS,
             )
 
             save_leaderboard({

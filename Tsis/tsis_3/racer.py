@@ -1,3 +1,13 @@
+"""
+racer.py — sprites, safe-spawn registry, game loop, and all Pygame screens.
+
+Safe-spawn registry
+───────────────────
+Every live object registers its bounding rect. Before any new object is
+placed it checks the registry so nothing spawns on top of anything else.
+Objects deregister themselves when they leave the screen or are collected.
+"""
+
 import pygame, random, os
 from ui import (draw_bg, draw_hud, draw_text,
                 Button, TextInput,
@@ -419,7 +429,7 @@ class SlowStrip:
 # ═════════════════════════════════════════════════════════════════════════════
 
 def run_game(surface, clock, bg_image, player_images, enemy_image,
-             crash_sound, settings, username) -> dict:
+             crash_sound, settings, username, assets_dir: str = "assets") -> dict:
     """Run one session. Returns {score, distance, coins}."""
 
     mult     = DIFF_MULT.get(settings.get("difficulty", "normal"), 1.0)
@@ -459,7 +469,7 @@ def run_game(surface, clock, bg_image, player_images, enemy_image,
 
     if sound_on:
         try:
-            pygame.mixer.music.load(os.path.join("assets", "background.wav"))
+            pygame.mixer.music.load(os.path.join(assets_dir, "background.wav"))
             pygame.mixer.music.play(-1)
         except Exception:
             pass
@@ -613,6 +623,20 @@ def run_game(surface, clock, bg_image, player_images, enemy_image,
         for c  in coins:     c.draw(surface)
         for sp in all_sprites:
             surface.blit(sp.image, sp.rect)
+
+        # Shield bubble — pulsing cyan ring around the car
+        if player.shield:
+            pulse = abs((now // 8) % 40 - 20)          # 0-20 oscillation
+            r_shield = player.rect.width // 2 + 8 + pulse // 4
+            shield_surf = pygame.Surface(
+                (r_shield * 2 + 4, r_shield * 2 + 4), pygame.SRCALPHA)
+            pygame.draw.circle(shield_surf, (0, 220, 255, 80),
+                               (r_shield + 2, r_shield + 2), r_shield)
+            pygame.draw.circle(shield_surf, (0, 220, 255, 200),
+                               (r_shield + 2, r_shield + 2), r_shield, 3)
+            surface.blit(shield_surf,
+                         (player.rect.centerx - r_shield - 2,
+                          player.rect.centery - r_shield - 2))
 
         nitro_left = max(0, player.nitro_end - now) if player.nitro else 0
         draw_hud(surface, score, coin_count, distance,
@@ -778,16 +802,13 @@ def settings_screen(surface, clock, bg_image, settings: dict, save_fn):
 
         # Swatches
         for i, col in enumerate(CAR_COLORS):
-            sr = _swatch_rect(i)
+            sr  = _swatch_rect(i)
             rgb = _CAR_RGB[col]
             sel = settings["car_color"] == col
-
             if sel:
                 pygame.draw.rect(surface, rgb, sr.inflate(8, 8), border_radius=10)
-
             pygame.draw.rect(surface, rgb, sr, border_radius=7)
             pygame.draw.rect(surface, WHITE if sel else (70, 70, 70), sr, 2, border_radius=7)
-
             lbl = F_TINY.render(col.capitalize(), True, WHITE if sel else GRAY)
             surface.blit(lbl, lbl.get_rect(centerx=sr.centerx, top=SW_LABEL_Y))
 
