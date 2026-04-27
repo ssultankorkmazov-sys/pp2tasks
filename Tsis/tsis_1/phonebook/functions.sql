@@ -21,8 +21,7 @@ RETURNS TABLE (
     email VARCHAR,
     birthday DATE,
     group_name VARCHAR,
-    phone VARCHAR,
-    type VARCHAR
+    phones TEXT
 )
 AS $$
 BEGIN
@@ -33,11 +32,11 @@ BEGIN
         c.email,
         c.birthday,
         g.name,
-        p.phone,
-        p.type
+        STRING_AGG(p.phone || ' (' || p.type || ')', ', ' ORDER BY p.id)
     FROM contacts c
     LEFT JOIN groups g ON c.group_id = g.id
     LEFT JOIN phones p ON c.id = p.contact_id
+    GROUP BY c.id, c.name, c.email, c.birthday, g.name
     ORDER BY c.id
     LIMIT limit_value
     OFFSET offset_value;

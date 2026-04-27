@@ -122,10 +122,13 @@ def insert_from_csv():
 def get_all_contacts(choice):
     with conn.cursor() as cur:
         cur.execute(f"""
-            SELECT c.id, c.name, c.email, c.birthday, g.name, p.phone, p.type
+            SELECT
+                c.id, c.name, c.email, c.birthday, g.name,
+                STRING_AGG(p.phone || ' (' || p.type || ')', ', ' ORDER BY p.id) AS phones
             FROM contacts c
             LEFT JOIN groups g ON c.group_id = g.id
             LEFT JOIN phones p ON c.id = p.contact_id
+            GROUP BY c.id, c.name, c.email, c.birthday, g.name
             ORDER BY c.{choice}
         """)
         return cur.fetchall()
@@ -137,7 +140,7 @@ def print_contacts(contacts):
         return
 
     for c in contacts:
-        print(f"[{c[0]}] {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]} ({c[6]})")
+        print(f"[{c[0]}] {c[1]} | {c[2]} | {c[3]} | {c[4]} | {c[5]}")
 
 
 # ---------- UPDATE ----------
@@ -169,43 +172,41 @@ def find_by_pattern():
     pattern = input("Enter pattern: ").strip()
 
     with conn.cursor() as cur:
+        agg_select = """
+            SELECT
+                c.id, c.name, c.email, c.birthday, g.name,
+                STRING_AGG(p.phone || ' (' || p.type || ')', ', ' ORDER BY p.id) AS phones
+            FROM contacts c
+            LEFT JOIN groups g ON c.group_id = g.id
+            LEFT JOIN phones p ON c.id = p.contact_id
+        """
         if choice == "1":
-            cur.execute("""
-                SELECT c.id, c.name, c.email, c.birthday, g.name, p.phone, p.type
-                FROM contacts c
-                LEFT JOIN groups g ON c.group_id = g.id
-                LEFT JOIN phones p ON c.id = p.contact_id
+            cur.execute(agg_select + """
                 WHERE c.name ILIKE %s
+                GROUP BY c.id, c.name, c.email, c.birthday, g.name
                 ORDER BY c.id
             """, (f"%{pattern}%",))
 
         elif choice == "2":
-            cur.execute("""
-                SELECT c.id, c.name, c.email, c.birthday, g.name, p.phone, p.type
-                FROM contacts c
-                LEFT JOIN groups g ON c.group_id = g.id
-                LEFT JOIN phones p ON c.id = p.contact_id
-                WHERE p.phone ILIKE %s
+            cur.execute(agg_select + """
+                WHERE c.id IN (
+                    SELECT contact_id FROM phones WHERE phone ILIKE %s
+                )
+                GROUP BY c.id, c.name, c.email, c.birthday, g.name
                 ORDER BY c.id
             """, (f"%{pattern}%",))
 
         elif choice == "3":
-            cur.execute("""
-                SELECT c.id, c.name, c.email, c.birthday, g.name, p.phone, p.type
-                FROM contacts c
-                LEFT JOIN groups g ON c.group_id = g.id
-                LEFT JOIN phones p ON c.id = p.contact_id
+            cur.execute(agg_select + """
                 WHERE c.email ILIKE %s
+                GROUP BY c.id, c.name, c.email, c.birthday, g.name
                 ORDER BY c.id
             """, (f"%{pattern}%",))
 
         elif choice == "4":
-            cur.execute("""
-                SELECT c.id, c.name, c.email, c.birthday, g.name, p.phone, p.type
-                FROM contacts c
-                LEFT JOIN groups g ON c.group_id = g.id
-                LEFT JOIN phones p ON c.id = p.contact_id
+            cur.execute(agg_select + """
                 WHERE g.name ILIKE %s
+                GROUP BY c.id, c.name, c.email, c.birthday, g.name
                 ORDER BY c.id
             """, (f"%{pattern}%",))
 
@@ -233,11 +234,14 @@ def filter_by_group():
 
     with conn.cursor() as cur:
         cur.execute("""
-            SELECT c.id, c.name, c.email, c.birthday, g.name, p.phone, p.type
+            SELECT
+                c.id, c.name, c.email, c.birthday, g.name,
+                STRING_AGG(p.phone || ' (' || p.type || ')', ', ' ORDER BY p.id) AS phones
             FROM contacts c
             JOIN groups g ON c.group_id = g.id
             LEFT JOIN phones p ON c.id = p.contact_id
             WHERE g.name ILIKE %s
+            GROUP BY c.id, c.name, c.email, c.birthday, g.name
             ORDER BY c.id
         """, (f"%{group}%",))
 
