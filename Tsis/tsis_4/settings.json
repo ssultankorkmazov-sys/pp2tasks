@@ -4,7 +4,7 @@
     220,
     220
   ],
-  "grid_overlay": false,
+  "grid_overlay": true,
   "sound": true,
   "car_color": "yellow",
   "difficulty": "normal"
